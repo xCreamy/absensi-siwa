@@ -532,7 +532,7 @@
       }
       const entered = window.prompt('Masukkan PIN untuk membuka Pengaturan:');
       if(entered === null) return; // dibatalkan, tetap di tab semula
-      if(entered !== (state.config.settingsPin || '1234')){
+      if(entered !== (state.config.settingsPin || 'Bismillah')){
         settingsFailCount++;
         if(settingsFailCount >= 3){
           settingsLockUntil = Date.now() + 30000;
