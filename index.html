@@ -188,7 +188,8 @@
     cutoffTime: '07:15',
     emailjsServiceId: '',
     emailjsTemplateId: '',
-    emailjsPublicKey: ''
+    emailjsPublicKey: '',
+    settingsPin: '13246153256'
   };
 
   let state = {
@@ -197,7 +198,8 @@
     attendance: [],
     config: DEFAULT_CONFIG,
     search: '',
-    loaded: false
+    loaded: false,
+    settingsUnlocked: false
   };
 
   function pad(n){ return String(n).padStart(2,'0'); }
@@ -418,6 +420,13 @@
       + '    <button class="btn btn-ghost" id="test-email">Kirim email tes</button>'
       + '    <button class="btn btn-primary" id="save-settings">Simpan</button>'
       + '  </div>'
+      + '</div>'
+
+      + '<div class="card">'
+      + '  <div class="card-title">Keamanan</div>'
+      + '  <label>PIN untuk membuka tab Pengaturan</label>'
+      + '  <input type="text" id="settings-pin" value="'+escapeAttr(state.config.settingsPin)+'" placeholder="4 digit angka">'
+      + '  <div class="small-note">Siswa harus memasukkan PIN ini untuk membuka tab Pengaturan. Ganti PIN kapan saja lalu tekan Simpan.</div>'
       + '</div>';
 
     $('#add-student', el).addEventListener('click', async () => {
@@ -447,6 +456,7 @@
       state.config.emailjsServiceId = $('#ejs-service', el).value.trim();
       state.config.emailjsTemplateId = $('#ejs-template', el).value.trim();
       state.config.emailjsPublicKey = $('#ejs-public', el).value.trim();
+      state.config.settingsPin = $('#settings-pin', el).value.trim() || '1234';
       await saveConfig();
       updateHeader();
       showToast('Pengaturan disimpan');
@@ -510,6 +520,15 @@
 
   // ---------- TABS ----------
   function switchTab(tab){
+    if(tab === 'settings' && !state.settingsUnlocked){
+      const entered = window.prompt('Masukkan PIN untuk membuka Pengaturan:');
+      if(entered === null) return; // dibatalkan, tetap di tab semula
+      if(entered !== (state.config.settingsPin || '1234')){
+        showToast('PIN salah');
+        return;
+      }
+      state.settingsUnlocked = true;
+    }
     state.tab = tab;
     $$('.tab-btn', root).forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
     $('#tab-checkin', root).style.display = tab === 'checkin' ? 'block' : 'none';
