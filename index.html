@@ -189,7 +189,7 @@
     emailjsServiceId: '',
     emailjsTemplateId: '',
     emailjsPublicKey: '',
-    settingsPin: '13246153256'
+    settingsPin: '1234'
   };
 
   let state = {
@@ -519,15 +519,31 @@
   function escapeAttr(str){ return escapeHtml(str); }
 
   // ---------- TABS ----------
+  let settingsLockUntil = 0;
+  let settingsFailCount = 0;
+
   function switchTab(tab){
-    if(tab === 'settings' && !state.settingsUnlocked){
+    if(tab === 'settings'){
+      const now = Date.now();
+      if(now < settingsLockUntil){
+        const secs = Math.ceil((settingsLockUntil - now)/1000);
+        showToast('Terlalu banyak percobaan salah. Coba lagi dalam '+secs+' detik.');
+        return;
+      }
       const entered = window.prompt('Masukkan PIN untuk membuka Pengaturan:');
       if(entered === null) return; // dibatalkan, tetap di tab semula
       if(entered !== (state.config.settingsPin || '1234')){
-        showToast('PIN salah');
+        settingsFailCount++;
+        if(settingsFailCount >= 3){
+          settingsLockUntil = Date.now() + 30000;
+          settingsFailCount = 0;
+          showToast('3x salah. Pengaturan terkunci 30 detik.');
+        } else {
+          showToast('PIN salah');
+        }
         return;
       }
-      state.settingsUnlocked = true;
+      settingsFailCount = 0;
     }
     state.tab = tab;
     $$('.tab-btn', root).forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
