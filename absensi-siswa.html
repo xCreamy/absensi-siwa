@@ -1,0 +1,558 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  #absensi-app{
+    --ink:#0F1830;
+    --surface:#17223C;
+    --surface-2:#1E2C4C;
+    --paper:#ECE7D9;
+    --paper-dim:#B9B3A0;
+    --stamp-red:#C23B2E;
+    --stamp-red-dim:#8C2A21;
+    --hadir:#3E9179;
+    --telat:#D9962E;
+    --absen:#B23A32;
+    --line:rgba(236,231,217,0.12);
+    font-family:'Inter',sans-serif;
+    background:var(--ink);
+    color:var(--paper);
+    min-height:100vh;
+    padding:0;
+    box-sizing:border-box;
+  }
+  #absensi-app *{box-sizing:border-box;}
+  #absensi-app .font-display{font-family:'Fraunces',serif;}
+  #absensi-app .font-mono{font-family:'JetBrains Mono',monospace;}
+
+  #absensi-app .wrap{max-width:720px;margin:0 auto;padding:20px 16px 60px;}
+
+  #absensi-app .header{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px;
+    position:relative;
+  }
+  #absensi-app .title{font-size:26px;font-weight:600;letter-spacing:-0.02em;}
+  #absensi-app .subtitle{font-size:12.5px;color:var(--paper-dim);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+  #absensi-app .stamp-badge{
+    width:56px;height:56px;border-radius:50%;
+    border:2.5px solid var(--stamp-red);color:var(--stamp-red);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:700;font-size:10px;text-align:center;line-height:1.1;
+    transform:rotate(-10deg);opacity:0.9;flex-shrink:0;
+  }
+
+  #absensi-app .tabs{display:flex;gap:6px;margin-bottom:22px;background:var(--surface);padding:5px;border-radius:12px;}
+  #absensi-app .tab-btn{
+    flex:1;padding:10px 8px;border-radius:8px;border:none;background:transparent;color:var(--paper-dim);
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .15s ease;
+  }
+  #absensi-app .tab-btn.active{background:var(--stamp-red);color:var(--paper);}
+
+  #absensi-app .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;}
+  #absensi-app .card-title{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin:0 0 12px 0;}
+
+  #absensi-app input[type=text], #absensi-app input[type=email], #absensi-app input[type=time]{
+    width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--paper);
+    padding:11px 12px;border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;outline:none;
+  }
+  #absensi-app input::placeholder{color:var(--paper-dim);}
+  #absensi-app input:focus{border-color:var(--stamp-red);}
+  #absensi-app label{font-size:12px;color:var(--paper-dim);display:block;margin-bottom:6px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;}
+
+  #absensi-app .btn{
+    padding:11px 16px;border-radius:9px;border:none;font-weight:600;font-size:13.5px;cursor:pointer;
+    font-family:'Inter',sans-serif;transition:transform .1s ease, opacity .15s ease;
+  }
+  #absensi-app .btn:active{transform:scale(0.97);}
+  #absensi-app .btn-primary{background:var(--stamp-red);color:var(--paper);}
+  #absensi-app .btn-ghost{background:var(--surface-2);color:var(--paper);}
+  #absensi-app .btn-full{width:100%;}
+  #absensi-app .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  #absensi-app .student-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;max-height:340px;overflow-y:auto;}
+  #absensi-app .student-tile{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 10px;
+    text-align:left;cursor:pointer;color:var(--paper);font-size:13.5px;font-weight:600;
+    display:flex;justify-content:space-between;align-items:center;gap:6px;
+  }
+  #absensi-app .student-tile.done{opacity:0.45;cursor:default;}
+  #absensi-app .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  #absensi-app .dot-hadir{background:var(--hadir);}
+  #absensi-app .dot-telat{background:var(--telat);}
+  #absensi-app .dot-none{background:var(--paper-dim);opacity:.5;}
+
+  #absensi-app .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+  #absensi-app .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center;}
+  #absensi-app .stat-num{font-family:'Fraunces',serif;font-size:26px;font-weight:600;}
+  #absensi-app .stat-label{font-size:10.5px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+
+  #absensi-app .live-dot{width:7px;height:7px;border-radius:50%;background:var(--hadir);display:inline-block;margin-right:6px;animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  #absensi-app .ledger-row{
+    display:flex;justify-content:space-between;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  #absensi-app .ledger-row:last-child{border-bottom:none;}
+  #absensi-app .ledger-name{font-weight:600;}
+  #absensi-app .ledger-time{font-family:'JetBrains Mono',monospace;color:var(--paper-dim);font-size:12px;}
+  #absensi-app .badge{padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+  #absensi-app .badge-hadir{background:rgba(62,145,121,0.18);color:var(--hadir);}
+  #absensi-app .badge-telat{background:rgba(217,150,46,0.18);color:var(--telat);}
+  #absensi-app .empty{color:var(--paper-dim);font-size:13px;text-align:center;padding:22px 0;}
+
+  #absensi-app .roster-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+  #absensi-app .roster-row:last-child{border-bottom:none;}
+  #absensi-app .link-del{color:var(--stamp-red);font-size:12px;font-weight:600;cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;}
+
+  #absensi-app .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--surface-2);border:1px solid var(--line);color:var(--paper);
+    padding:10px 18px;border-radius:10px;font-size:13px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.4);
+    opacity:0;transition:opacity .25s ease;pointer-events:none;
+  }
+  #absensi-app .toast.show{opacity:1;}
+
+  /* Stamp modal */
+  #absensi-app .modal-bg{
+    position:fixed;inset:0;background:rgba(6,10,22,0.75);display:none;align-items:center;justify-content:center;z-index:40;padding:20px;
+  }
+  #absensi-app .modal-bg.show{display:flex;}
+  #absensi-app .modal{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 22px;max-width:340px;width:100%;
+    text-align:center;position:relative;overflow:hidden;
+  }
+  #absensi-app .modal-name{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:4px 0 2px;}
+  #absensi-app .modal-sub{font-size:12.5px;color:var(--paper-dim);margin-bottom:20px;}
+  #absensi-app .stamp-circle{
+    width:120px;height:120px;border-radius:50%;border:4px solid var(--stamp-red);color:var(--stamp-red);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+    font-family:'Fraunces',serif;font-weight:700;font-size:15px;transform:scale(2.4) rotate(0deg);opacity:0;
+  }
+  #absensi-app .stamp-circle.animate{animation:stampDown .5s cubic-bezier(.2,.9,.3,1.3) forwards;}
+  @keyframes stampDown{
+    0%{transform:scale(2.4) rotate(8deg);opacity:0;}
+    60%{transform:scale(0.92) rotate(-6deg);opacity:1;}
+    100%{transform:scale(1) rotate(-8deg);opacity:1;}
+  }
+  #absensi-app .stamp-inner{border:1.5px solid var(--stamp-red);border-radius:50%;width:92%;height:92%;display:flex;align-items:center;justify-content:center;}
+
+  #absensi-app .small-note{font-size:11.5px;color:var(--paper-dim);line-height:1.5;margin-top:8px;}
+  #absensi-app a{color:var(--telat);}
+  #absensi-app .row-gap{display:flex;gap:8px;}
+  #absensi-app .row-gap > *{flex:1;}
+</style>
+
+<div id="absensi-app">
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <div class="title font-display" id="app-title">Absensi Siswa</div>
+        <div class="subtitle" id="header-date">—</div>
+      </div>
+      <div class="stamp-badge">SAH<br/>HADIR</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="checkin">Absen</button>
+      <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="settings">Pengaturan</button>
+    </div>
+
+    <div id="tab-checkin"></div>
+    <div id="tab-dashboard" style="display:none;"></div>
+    <div id="tab-settings" style="display:none;"></div>
+  </div>
+
+  <div class="modal-bg" id="stamp-modal">
+    <div class="modal">
+      <div class="stamp-circle" id="stamp-circle"><div class="stamp-inner" id="stamp-inner-text">HADIR</div></div>
+      <div class="modal-name" id="modal-name">—</div>
+      <div class="modal-sub" id="modal-sub">Absen berhasil dicatat</div>
+      <button class="btn btn-primary btn-full" id="modal-close">Selesai</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  const root = document.getElementById('absensi-app');
+  const $ = (sel, ctx) => (ctx||document).querySelector(sel);
+  const $$ = (sel, ctx) => Array.from((ctx||document).querySelectorAll(sel));
+
+  const DEFAULT_CONFIG = {
+    schoolName: 'Absensi Siswa',
+    notifyEmail: 'rayrinaldo99@gmail.com',
+    cutoffTime: '07:15',
+    emailjsServiceId: '',
+    emailjsTemplateId: '',
+    emailjsPublicKey: ''
+  };
+
+  let state = {
+    tab: 'checkin',
+    roster: [],
+    attendance: [],
+    config: DEFAULT_CONFIG,
+    search: '',
+    loaded: false
+  };
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function dateKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function timeStr(d){ return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
+  function todayKey(){ return dateKey(new Date()); }
+
+  function showToast(msg){
+    const t = $('#toast', root);
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 2600);
+  }
+
+  async function storageGet(key, shared){
+    try{
+      const r = await window.storage.get(key, !!shared);
+      return r ? r.value : null;
+    }catch(e){ return null; }
+  }
+  async function storageSet(key, value, shared){
+    try{
+      await window.storage.set(key, value, !!shared);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  async function loadAll(){
+    const [rosterRaw, configRaw, attRaw] = await Promise.all([
+      storageGet('roster', true),
+      storageGet('config', true),
+      storageGet('attendance:'+todayKey(), true)
+    ]);
+    state.roster = rosterRaw ? JSON.parse(rosterRaw) : [];
+    state.config = configRaw ? Object.assign({}, DEFAULT_CONFIG, JSON.parse(configRaw)) : DEFAULT_CONFIG;
+    state.attendance = attRaw ? JSON.parse(attRaw) : [];
+    state.loaded = true;
+  }
+
+  async function saveRoster(){
+    await storageSet('roster', JSON.stringify(state.roster), true);
+  }
+  async function saveConfig(){
+    await storageSet('config', JSON.stringify(state.config), true);
+  }
+  async function saveAttendance(){
+    await storageSet('attendance:'+todayKey(), JSON.stringify(state.attendance), true);
+  }
+
+  function updateHeader(){
+    $('#app-title', root).textContent = state.config.schoolName || 'Absensi Siswa';
+    const now = new Date();
+    const dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
+    const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    $('#header-date', root).textContent = dayNames[now.getDay()]+', '+now.getDate()+' '+monthNames[now.getMonth()]+' '+now.getFullYear();
+  }
+
+  function statusFor(record){
+    // record.time is HH:MM:SS
+    const cutoff = state.config.cutoffTime || '07:15';
+    return record.time.slice(0,5) > cutoff ? 'telat' : 'hadir';
+  }
+
+  // ---------- CHECK-IN TAB ----------
+  function renderCheckin(){
+    const el = $('#tab-checkin', root);
+    const doneIds = new Set(state.attendance.map(a => a.id));
+    const filtered = state.roster.filter(s => s.name.toLowerCase().includes(state.search.toLowerCase()));
+
+    let tiles = filtered.map(s => {
+      const done = doneIds.has(s.id);
+      const rec = state.attendance.find(a => a.id === s.id);
+      const dotClass = done ? (statusFor(rec)==='telat' ? 'dot-telat':'dot-hadir') : 'dot-none';
+      return '<button class="student-tile '+(done?'done':'')+'" data-id="'+s.id+'" '+(done?'disabled':'')+'>'
+        + '<span>'+escapeHtml(s.name)+'</span><span class="dot '+dotClass+'"></span></button>';
+    }).join('');
+
+    if(state.roster.length === 0){
+      tiles = '<div class="empty">Belum ada siswa. Tambahkan daftar siswa di tab Pengaturan.</div>';
+    } else if(filtered.length === 0){
+      tiles = '<div class="empty">Nama tidak ditemukan.</div>';
+    }
+
+    el.innerHTML = ''
+      + '<div class="card">'
+      + '  <div class="card-title">Tap nama untuk absen masuk</div>'
+      + '  <input type="text" id="search-input" placeholder="Cari nama siswa..." value="'+escapeAttr(state.search)+'">'
+      + '  <div class="student-grid" id="student-grid">'+tiles+'</div>'
+      + '</div>';
+
+    $('#search-input', el).addEventListener('input', e => {
+      state.search = e.target.value;
+      renderCheckin();
+      // keep focus after re-render
+      const inp = $('#search-input', el);
+      inp.focus();
+      inp.selectionStart = inp.selectionEnd = inp.value.length;
+    });
+
+    $$('.student-tile', el).forEach(btn => {
+      btn.addEventListener('click', () => handleCheckin(btn.getAttribute('data-id')));
+    });
+  }
+
+  async function handleCheckin(studentId){
+    const student = state.roster.find(s => s.id === studentId);
+    if(!student) return;
+    if(state.attendance.some(a => a.id === studentId)){
+      showToast(student.name + ' sudah absen hari ini');
+      return;
+    }
+    const now = new Date();
+    const record = { id: studentId, name: student.name, time: timeStr(now), ts: now.toISOString() };
+    state.attendance.push(record);
+    await saveAttendance();
+
+    const status = statusFor(record);
+    openStampModal(student.name, status);
+    renderCheckin();
+    if(state.tab === 'dashboard') renderDashboard();
+
+    sendEmailNotification(record, status); // fire and forget
+  }
+
+  function openStampModal(name, status){
+    const modal = $('#stamp-modal', root);
+    const circle = $('#stamp-circle', root);
+    $('#modal-name', root).textContent = name;
+    $('#modal-sub', root).textContent = status === 'telat'
+      ? 'Absen tercatat — status: Telat'
+      : 'Absen tercatat — status: Hadir';
+    $('#stamp-inner-text', root).textContent = status === 'telat' ? 'TELAT' : 'HADIR';
+    circle.style.borderColor = status === 'telat' ? 'var(--telat)' : 'var(--hadir)';
+    circle.style.color = status === 'telat' ? 'var(--telat)' : 'var(--hadir)';
+    $('#stamp-inner-text', root).style.borderColor = status === 'telat' ? 'var(--telat)' : 'var(--hadir)';
+    circle.classList.remove('animate');
+    void circle.offsetWidth; // reflow to restart animation
+    circle.classList.add('animate');
+    modal.classList.add('show');
+  }
+
+  // ---------- DASHBOARD TAB ----------
+  function renderDashboard(){
+    const el = $('#tab-dashboard', root);
+    const total = state.roster.length;
+    const hadir = state.attendance.filter(a => statusFor(a) === 'hadir').length;
+    const telat = state.attendance.filter(a => statusFor(a) === 'telat').length;
+    const belum = Math.max(total - state.attendance.length, 0);
+
+    const rows = [...state.attendance].sort((a,b)=> a.time < b.time ? 1 : -1).map(a => {
+      const st = statusFor(a);
+      return '<div class="ledger-row"><span class="ledger-name">'+escapeHtml(a.name)+'</span>'
+        + '<span style="display:flex;align-items:center;gap:10px;">'
+        + '<span class="ledger-time font-mono">'+a.time+'</span>'
+        + '<span class="badge '+(st==='telat'?'badge-telat':'badge-hadir')+'">'+(st==='telat'?'Telat':'Hadir')+'</span>'
+        + '</span></div>';
+    }).join('');
+
+    el.innerHTML = ''
+      + '<div class="stats-row">'
+      + '  <div class="stat"><div class="stat-num" style="color:var(--hadir)">'+hadir+'</div><div class="stat-label">Hadir</div></div>'
+      + '  <div class="stat"><div class="stat-num" style="color:var(--telat)">'+telat+'</div><div class="stat-label">Telat</div></div>'
+      + '  <div class="stat"><div class="stat-num" style="color:var(--paper-dim)">'+belum+'</div><div class="stat-label">Belum absen</div></div>'
+      + '</div>'
+      + '<div class="card">'
+      + '  <div class="card-title" style="display:flex;align-items:center;"><span class="live-dot"></span>Daftar hadir hari ini</div>'
+      + (rows || '<div class="empty">Belum ada siswa yang absen.</div>')
+      + '  <div class="small-note">Diperbarui otomatis setiap ±5 detik. Total siswa terdaftar: '+total+'.</div>'
+      + '</div>';
+  }
+
+  // ---------- SETTINGS TAB ----------
+  function renderSettings(){
+    const el = $('#tab-settings', root);
+    const rosterRows = state.roster.length
+      ? state.roster.map(s => '<div class="roster-row"><span>'+escapeHtml(s.name)+'</span><button class="link-del" data-id="'+s.id+'">Hapus</button></div>').join('')
+      : '<div class="empty">Belum ada siswa.</div>';
+
+    el.innerHTML = ''
+      + '<div class="card">'
+      + '  <div class="card-title">Nama sekolah / kelas</div>'
+      + '  <input type="text" id="school-name" value="'+escapeAttr(state.config.schoolName)+'" placeholder="Contoh: Kelas 6A SDN 01">'
+      + '</div>'
+
+      + '<div class="card">'
+      + '  <div class="card-title">Daftar siswa</div>'
+      + '  <div class="row-gap">'
+      + '    <input type="text" id="new-student" placeholder="Nama siswa baru...">'
+      + '    <button class="btn btn-primary" id="add-student" style="flex:0 0 auto;">Tambah</button>'
+      + '  </div>'
+      + '  <div style="margin-top:12px;max-height:220px;overflow-y:auto;">'+rosterRows+'</div>'
+      + '</div>'
+
+      + '<div class="card">'
+      + '  <div class="card-title">Jam batas terlambat</div>'
+      + '  <input type="time" id="cutoff-time" value="'+escapeAttr(state.config.cutoffTime)+'">'
+      + '  <div class="small-note">Absen setelah jam ini otomatis berstatus "Telat".</div>'
+      + '</div>'
+
+      + '<div class="card">'
+      + '  <div class="card-title">Notifikasi email</div>'
+      + '  <label>Email tujuan notifikasi</label>'
+      + '  <input type="email" id="notify-email" value="'+escapeAttr(state.config.notifyEmail)+'">'
+      + '  <div style="height:12px;"></div>'
+      + '  <label>EmailJS Service ID</label>'
+      + '  <input type="text" id="ejs-service" value="'+escapeAttr(state.config.emailjsServiceId)+'" placeholder="service_xxxxxxx">'
+      + '  <div style="height:10px;"></div>'
+      + '  <label>EmailJS Template ID</label>'
+      + '  <input type="text" id="ejs-template" value="'+escapeAttr(state.config.emailjsTemplateId)+'" placeholder="template_xxxxxxx">'
+      + '  <div style="height:10px;"></div>'
+      + '  <label>EmailJS Public Key</label>'
+      + '  <input type="text" id="ejs-public" value="'+escapeAttr(state.config.emailjsPublicKey)+'" placeholder="xxxxxxxxxxxxxxxx">'
+      + '  <div class="small-note">Wajib diisi agar email notifikasi benar-benar terkirim. Buat akun gratis di '
+      + '  <a href="https://www.emailjs.com" target="_blank" rel="noopener">emailjs.com</a>, tanpa server tambahan. '
+      + '  Lihat instruksi lengkap di percakapan.</div>'
+      + '  <div style="height:14px;"></div>'
+      + '  <div class="row-gap">'
+      + '    <button class="btn btn-ghost" id="test-email">Kirim email tes</button>'
+      + '    <button class="btn btn-primary" id="save-settings">Simpan</button>'
+      + '  </div>'
+      + '</div>';
+
+    $('#add-student', el).addEventListener('click', async () => {
+      const inp = $('#new-student', el);
+      const name = inp.value.trim();
+      if(!name) return;
+      state.roster.push({ id: 's_'+Date.now()+'_'+Math.floor(Math.random()*1000), name });
+      await saveRoster();
+      inp.value = '';
+      renderSettings();
+      showToast('Siswa ditambahkan');
+    });
+
+    $$('.link-del', el).forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        state.roster = state.roster.filter(s => s.id !== id);
+        await saveRoster();
+        renderSettings();
+      });
+    });
+
+    $('#save-settings', el).addEventListener('click', async () => {
+      state.config.schoolName = $('#school-name', el).value.trim() || 'Absensi Siswa';
+      state.config.cutoffTime = $('#cutoff-time', el).value || '07:15';
+      state.config.notifyEmail = $('#notify-email', el).value.trim();
+      state.config.emailjsServiceId = $('#ejs-service', el).value.trim();
+      state.config.emailjsTemplateId = $('#ejs-template', el).value.trim();
+      state.config.emailjsPublicKey = $('#ejs-public', el).value.trim();
+      await saveConfig();
+      updateHeader();
+      showToast('Pengaturan disimpan');
+    });
+
+    $('#test-email', el).addEventListener('click', async () => {
+      const cfgSnapshot = {
+        emailjsServiceId: $('#ejs-service', el).value.trim(),
+        emailjsTemplateId: $('#ejs-template', el).value.trim(),
+        emailjsPublicKey: $('#ejs-public', el).value.trim(),
+        notifyEmail: $('#notify-email', el).value.trim()
+      };
+      if(!cfgSnapshot.emailjsServiceId || !cfgSnapshot.emailjsTemplateId || !cfgSnapshot.emailjsPublicKey){
+        showToast('Isi Service ID, Template ID, dan Public Key dulu');
+        return;
+      }
+      const ok = await sendEmailNotification(
+        { name: 'Siswa Tes', time: timeStr(new Date()) },
+        'hadir',
+        cfgSnapshot
+      );
+      showToast(ok ? 'Email tes terkirim' : 'Gagal kirim — cek kembali kredensial EmailJS');
+    });
+  }
+
+  // ---------- EMAIL ----------
+  async function sendEmailNotification(record, status, cfgOverride){
+    const cfg = cfgOverride || state.config;
+    if(!cfg.emailjsServiceId || !cfg.emailjsTemplateId || !cfg.emailjsPublicKey || !cfg.notifyEmail){
+      return false; // not configured yet — silently skip
+    }
+    try{
+      const resp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: cfg.emailjsServiceId,
+          template_id: cfg.emailjsTemplateId,
+          user_id: cfg.emailjsPublicKey,
+          template_params: {
+            to_email: cfg.notifyEmail,
+            student_name: record.name,
+            check_in_time: record.time,
+            status: status === 'telat' ? 'Telat' : 'Hadir',
+            date: todayKey(),
+            school_name: state.config.schoolName
+          }
+        })
+      });
+      return resp.ok;
+    }catch(e){
+      return false;
+    }
+  }
+
+  // ---------- UTIL ----------
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function escapeAttr(str){ return escapeHtml(str); }
+
+  // ---------- TABS ----------
+  function switchTab(tab){
+    state.tab = tab;
+    $$('.tab-btn', root).forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
+    $('#tab-checkin', root).style.display = tab === 'checkin' ? 'block' : 'none';
+    $('#tab-dashboard', root).style.display = tab === 'dashboard' ? 'block' : 'none';
+    $('#tab-settings', root).style.display = tab === 'settings' ? 'block' : 'none';
+    if(tab === 'dashboard') renderDashboard();
+    if(tab === 'settings') renderSettings();
+    if(tab === 'checkin') renderCheckin();
+  }
+
+  $$('.tab-btn', root).forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+  });
+
+  $('#modal-close', root).addEventListener('click', () => {
+    $('#stamp-modal', root).classList.remove('show');
+  });
+
+  // ---------- POLLING (pseudo real-time) ----------
+  async function pollRefresh(){
+    const attRaw = await storageGet('attendance:'+todayKey(), true);
+    const newAtt = attRaw ? JSON.parse(attRaw) : [];
+    if(JSON.stringify(newAtt) !== JSON.stringify(state.attendance)){
+      state.attendance = newAtt;
+      if(state.tab === 'dashboard') renderDashboard();
+      if(state.tab === 'checkin') renderCheckin();
+    }
+    const rosterRaw = await storageGet('roster', true);
+    const newRoster = rosterRaw ? JSON.parse(rosterRaw) : [];
+    if(JSON.stringify(newRoster) !== JSON.stringify(state.roster)){
+      state.roster = newRoster;
+      if(state.tab === 'checkin') renderCheckin();
+      if(state.tab === 'dashboard') renderDashboard();
+    }
+  }
+  setInterval(pollRefresh, 5000);
+
+  // ---------- INIT ----------
+  (async function init(){
+    updateHeader();
+    await loadAll();
+    updateHeader();
+    renderCheckin();
+  })();
+})();
+</script>
